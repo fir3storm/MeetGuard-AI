@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 *.pyo
+*.egg
 *.egg-info/
 dist/
 build/
@@ -11,15 +12,30 @@ build/
 .idea/
 *.swp
 *.swo
+*~
 
 # OS
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Virtual env
 venv/
 .venv/
 env/
+
+# Environment / secrets
+.env
+.env.*
+*.key
+*.pem
+
+# Logs
+*.log
+
+# Backup / temp
+*.bak
+*.tmp
 
 # User data (voiceprints, session logs) — regenerated on use
 data/
@@ -37,3 +53,4 @@ config/*.local.yaml
 .pytest_cache/
 .coverage
 htmlcov/
+*.coverage.*
