@@ -1,0 +1,48 @@
+name: MeetGuard AI CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install system deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg libgl1-mesa-glx libglib2.0-0 portaudio19-dev
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements/base.txt
+          pip install -r requirements/dev.txt
+
+      - name: Lint with ruff
+        run: ruff check meetguard/
+
+      - name: Check formatting with black
+        run: black --check meetguard/ tests/
+
+      - name: Type check with mypy
+        run: mypy meetguard/ --ignore-missing-imports || true
+
+      - name: Test with pytest
+        run: pytest tests/ -v --tb=short --cov=meetguard --cov-report=term-missing
+
+      - name: Test CLI --dry-run
+        run: python -m meetguard.main --dry-run

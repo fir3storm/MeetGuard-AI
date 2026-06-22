@@ -1,0 +1,85 @@
+# ── Capture Settings ──────────────────────────────────────────────────
+capture:
+  # Frames per second for screen capture (5 is lightweight, 10+ for smoother)
+  fps: 5
+  # Audio sample rate in Hz (16000 for whisper, 44100 for higher quality)
+  audio_sample_rate: 16000
+  # Seconds of history to keep in ring buffers
+  buffer_seconds: 10
+  # Window title patterns to auto-detect meetings (glob-style * wildcards)
+  window_title_patterns:
+    - "Zoom*"
+    - "Google Meet*"
+    - "Microsoft Teams*"
+    - "*Meet*"
+
+# ── Detector Settings ─────────────────────────────────────────────────
+detectors:
+  deepfake_face:
+    enabled: true
+    model_path: "models/deepfake_3dcnn.pth"   # Relative to MEETGUARD_HOME (~/.meetguard)
+    window_frames: 16                          # Frames per detection window (~3s at 5 FPS)
+    threshold_suspicious: 0.50                 # Score ≥ 0.50 → SUSPICIOUS
+    threshold_critical: 0.75                   # Score ≥ 0.75 → CRITICAL
+
+  voice_mismatch:
+    enabled: true
+    similarity_threshold: 0.45                 # Cosine similarity < 0.45 = mismatch
+    enrollment_min_seconds: 30                 # Minimum audio for voiceprint enrollment
+    model: "speechbrain/spkrec-ecapa-voxceleb"
+
+  lip_sync:
+    enabled: true
+    confidence_threshold: 0.30                 # AV sync confidence < 0.30 = drift
+    window_seconds: 2.0                        # Window for sync analysis
+
+  suspicious_nlp:
+    enabled: true
+    model: "sentence-transformers/all-MiniLM-L6-v2"
+    enable_llm_fallback: false                 # Use local LLM for borderline cases
+    llm:
+      provider: "ollama"                       # ollama or huggingface
+      model: "mistral:7b"
+      api_url: "http://localhost:11434"
+
+  urgency_language:
+    enabled: true
+    threshold: 0.60                            # Score ≥ 0.60 → urgency flagged
+    use_prosodic: false                        # Audio-based prosodic analysis (Phase 2)
+
+# ── Fusion Engine ─────────────────────────────────────────────────────
+fusion:
+  # Weight each detector's contribution to total_risk (must sum to ~1.0)
+  weights:
+    face: 0.30
+    voice: 0.25
+    lip: 0.15
+    nlp: 0.20
+    urgency: 0.10
+  # Risk thresholds for classification
+  thresholds:
+    monitor: 0.20
+    suspicious: 0.45
+    critical: 0.75
+  # Seconds to suppress duplicate CRITICAL alerts for the same detector
+  cooldown_seconds: 60
+
+# ── Alerting ──────────────────────────────────────────────────────────
+alerting:
+  desktop_notifications: true                  # OS-native popup via plyer
+  sound_alert: true                            # Audible beep on CRITICAL
+  auto_record_clip: true                       # Save 30s video/audio clip on CRITICAL
+  clip_length_seconds: 30
+  log_sessions: true                            # Persist alerts to SQLite
+
+  # Webhook integrations (leave empty to disable)
+  webhooks:
+    slack_url: ""                               # https://hooks.slack.com/services/...
+    discord_url: ""                             # https://discord.com/api/webhooks/...
+    email:
+      smtp_host: ""
+      smtp_port: 587
+      from_addr: ""
+      to_addrs: []
+      # username and password are read from environment variables:
+      # MEETGUARD_SMTP_USER, MEETGUARD_SMTP_PASS

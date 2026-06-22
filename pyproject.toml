@@ -1,0 +1,72 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "meetguard-ai"
+version = "0.2.0"
+description = "Real-time deepfake & social engineering detection for video meetings"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+    "numpy>=1.24",
+    "opencv-python>=4.8",
+    "mss>=9",
+    "sounddevice>=0.4",
+    "soundfile>=0.12",
+    "faster-whisper>=1.0",
+    "sentence-transformers>=2.2",
+    "speechbrain>=0.5",
+    "mediapipe>=0.10",
+    "gradio>=4.0",
+    "fastapi>=0.100",
+    "uvicorn>=0.23",
+    "pyyaml>=6.0",
+    "plyer>=2.0",
+    "requests>=2.31",
+    "cryptography>=41",
+    "scipy>=1.10",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7",
+    "pytest-cov>=4",
+    "pytest-asyncio>=0.21",
+    "black>=23",
+    "ruff>=0.1",
+    "mypy>=1.5",
+]
+gpu = []
+all = [
+    "meetguard-ai[dev]",
+    "pyannote-audio>=3.0",
+    "transformers>=4.35",
+    "torch>=2.0",
+]
+
+[project.scripts]
+meetguard = "meetguard.main:cli"
+meetguard-enroll = "scripts.enroll_executive:main"
+meetguard-download-models = "scripts.download_models:main"
+
+[tool.setuptools.packages.find]
+include = ["meetguard*", "scripts*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W"]
+
+[tool.black]
+line-length = 110
+target-version = ["py311"]
+
+[tool.mypy]
+ignore_missing_imports = true

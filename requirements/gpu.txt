@@ -1,0 +1,4 @@
+# GPU support for PyTorch (CUDA 12.x)
+torch>=2.0
+torchvision>=0.15
+--extra-index-url https://download.pytorch.org/whl/cu121
