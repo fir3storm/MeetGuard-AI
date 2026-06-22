@@ -1,6 +1,41 @@
 # Changelog
 
-## v0.2.0 (2026-06-21)
+## v0.3.0 (2026-06-21)
+
+**Branding:** MeetGuard AI by Abhirup Guha — Info Security Solution
+
+### Added
+- **Speaker diarization** — `AudioSplitter` wired into pipeline: isolates speakers before voice
+  comparison, per-speaker scoring. Enabled via `diarization.enabled: true` in config.
+  Graceful fallback if pyannote-audio not installed.
+- **CLI subcommands** — `meetguard status` (engine PID + session summary),
+  `meetguard alerts` (alert history with `--json`), `meetguard report` (structured session
+  report with alert timeline). All offline — read SQLite directly.
+- **Performance metrics tab** — collapsible accordion in Gradio dashboard showing actual
+  FPS, frame buffer %, audio buffer %, mean tick time, uptime, pipeline ticks.
+- **Configuration profiles** — `--profile high-security` (15 FPS, tight thresholds 0.10/0.30/0.60,
+  enables LLM + diarization), `--profile balanced` (defaults),
+  `--profile low-resource` (3 FPS, disables lip-sync, higher thresholds, 120s cooldown).
+- **`measured_fps` property** on screen capture — tracks actual frame rate from timestamps.
+- **PID file** at `~/.meetguard/engine.pid` for `meetguard status` detection.
+- **Assets** — SVG logo and branding materials.
+- **34 new tests** — CLI commands, profiles, diarization config, screen FPS.
+  Total: 53 passing tests.
+
+### Changed
+- `config/default.yaml` — added `diarization` section with `enabled` and `hf_token`.
+- `meetguard/config.py` — `load()` accepts `profile` parameter, imports `meetguard.profiles`.
+- `meetguard/main.py` — diarization init + tick logic, CLI subparsers, perf metrics
+  collection and push to dashboard, `--profile` flag, PID file management.
+- `meetguard/ui/gradio_app.py` — `update_perf()`, `_get_perf_data()`, collapsible accordion
+  with auto-refreshing performance metrics.
+- `meetguard/capture/screen_capture.py` — `measured_fps` property with rolling frame times.
+- `meetguard/profiles.py` — **moved** from `meetguard/config/profiles.py` to fix import shadowing.
+- `pyproject.toml` — added author (`Abhirup Guha`) and maintainer (`Info Security Solution`).
+
+### Fixed
+- `AudioSplitter` was dead code — instantiated but never called. Now wired into pipeline.
+- Config fixture in tests — `diarization` key was nested under `capture` instead of top-level.
 
 ### Added
 - **CLI** — `meetguard` command with 11 options: `--config`, `--dry-run`, `--headless`,

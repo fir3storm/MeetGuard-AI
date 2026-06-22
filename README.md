@@ -1,33 +1,47 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/version-0.2.0-blue" alt="Version">
-  <img src="https://img.shields.io/badge/python-3.11%2B-blue" alt="Python">
-  <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
-  <img src="https://img.shields.io/badge/status-alpha-yellow" alt="Status">
+  <img src="assets/logo.svg" width="180" alt="MeetGuard AI Logo">
 </p>
 
-# 🛡️ MeetGuard AI
+<h1 align="center">MeetGuard AI</h1>
 
-**Real-time deepfake and social engineering detection for video meetings.**
+<p align="center">
+  <b>Real-time deepfake and social engineering detection for video meetings.</b>
+  <br>
+  <sub>Created by <a href="https://github.com/fir3storm">Abhirup Guha</a> — Info Security Solution</sub>
+</p>
 
-MeetGuard AI is a live security assistant that monitors Zoom, Microsoft Teams, and Google Meet calls. It captures the meeting's audio and video (via screen capture + audio loopback) and runs five parallel detectors every 3 seconds, flagging executive impersonation attempts in real time.
+<p align="center">
+  <img src="https://img.shields.io/badge/version-0.3.0-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/python-3.11%2B-blue?style=flat-square" alt="Python">
+  <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
+  <img src="https://img.shields.io/badge/tests-53_%E2%9C%85-22c55e?style=flat-square" alt="Tests">
+  <img src="https://img.shields.io/badge/status-production--ready-brightgreen?style=flat-square" alt="Status">
+</p>
+
+---
+
+**MeetGuard AI** is a live security assistant that monitors Zoom, Microsoft Teams, and Google Meet calls. It captures the meeting's audio and video via screen capture and system audio loopback, then runs five parallel detectors every 3 seconds to flag executive impersonation attempts — including deepfake faces, voice impersonation, lip-sync drift, fraudulent payment instructions, and social engineering pressure tactics.
+
+This tool is built and maintained by **Abhirup Guha** at **Info Security Solution** for enterprise-grade protection against the rising wave of AI-powered impersonation fraud in video conferencing.
 
 ---
 
 ## What it detects
 
-| Threat | Detector | What it catches |
-|---|---|---|
-| **Synthetic faces** | Deepfake Face (3DCNN) | Frame-by-frame deepfake generation — e.g. a real-time face swap of the CEO |
-| **Voice impersonation** | Voice Mismatch (ECAPA-TDNN) | Speaker doesn't match enrolled voiceprints — e.g. an impostor using a different voice |
-| **Desynced audio/video** | Lip-Sync (SyncNet) | Audio doesn't match lip movements — common in low-quality deepfakes |
-| **Fraud instructions** | Suspicious NLP (regex + Sentence-BERT) | "Change the vendor account to this new routing number" |
-| **Pressure tactics** | Urgency Language (weighted keywords) | "Transfer now — don't tell anyone — this is confidential" |
+| Threat | Detector | What it catches | Score |
+|---|---|---|---|
+| **Synthetic faces** | Deepfake Face (3DCNN) | Frame-by-frame deepfake generation — real-time face swaps of the CEO | 0–1 |
+| **Voice impersonation** | Voice Mismatch (ECAPA-TDNN) | Speaker doesn't match enrolled voiceprints — impostor using a different voice | 0–1 |
+| **Desynced audio/video** | Lip-Sync (SyncNet) | Audio doesn't match lip movements — common in low-quality deepfakes | 0–1 |
+| **Fraud instructions** | Suspicious NLP (regex + Sentence-BERT) | "Change the vendor account to this new routing number" | 0–1 |
+| **Pressure tactics** | Urgency Language (weighted keywords) | "Transfer now — don't tell anyone — this is confidential" | 0–1 |
 
 ### Use cases
 
 - **CFO fraud** — impersonator posing as the CEO requests an urgent wire transfer
-- **Vendor payment redirection** — fake vendor asks to update payment details
+- **Vendor payment redirection** — fake vendor asks to update payment details to a new account
 - **Executive whaling** — socially engineered pressure to bypass approval processes
+- **Board meeting security** — monitor sensitive calls for any signs of impersonation
 
 ---
 
@@ -70,59 +84,116 @@ python scripts/download_models.py
 Record a ~30 second sample of the executive speaking normally:
 
 ```bash
-# From a WAV file
 meetguard --enroll CEO ceo_voice.wav
-
-# Using the interactive CLI
-python scripts/enroll_executive.py --name "CFO" --record 30
+meetguard --enroll CFO cfo_voice.wav
 ```
-
-Repeat for each person you want to protect (CEO, CFO, etc.).
 
 ### 5. Run
 
 ```bash
-# Start your meeting, then:
-meetguard
+meetguard     # Opens dashboard at http://127.0.0.1:7860
 ```
 
-The dashboard opens at **http://127.0.0.1:7860**. On critical detections, you get a desktop notification, an audible alert, and a 30-second video/audio clip saved to `~/.meetguard/sessions/`.
+On critical detections, you get a desktop notification, an audible alert, and a 30-second video/audio clip saved to `~/.meetguard/sessions/`.
 
 ---
 
 ## CLI reference
 
 ```bash
-meetguard [options]
+meetguard [command] [options]
+
+Commands:
+  status                    Show engine status and last session summary
+  alerts                    List recent detection alerts
+  report                    Generate session report
+  --setup-audio             Interactive audio loopback setup wizard
 
 Options:
-  -c, --config FILE        Path to YAML config file
-  -v, --verbose            Debug logging level
-  --dry-run                Validate config + check dependencies, then exit
-  --headless               Run without Gradio dashboard
-  --setup-audio            Interactive audio loopback setup wizard
-  --list-audio-devices     List available audio input devices
-  --enroll NAME FILE       Enrol a voiceprint from a WAV file
-  --version                Print version and exit
+  -c, --config FILE         Path to YAML config file
+  -v, --verbose             Debug logging level
+  --profile PROFILE         Config profile: high-security, balanced, low-resource
+  --dry-run                 Validate config + check dependencies, then exit
+  --headless                Run without Gradio dashboard
+  --list-audio-devices      List available audio input devices
+  --enroll NAME FILE        Enrol a voiceprint from a WAV file
+  --version                 Print version and exit
 ```
 
-### Example: validate before running
+### Examples
 
 ```bash
-meetguard --dry-run -c my-config.yaml
+meetguard status                      # Check if engine is running
+meetguard alerts --limit 20 --json    # Last 20 alerts as JSON
+meetguard report --output report.json # Generate session report
+meetguard --profile high-security     # Run with stricter thresholds
+meetguard --dry-run                   # Validate config and exit
 ```
 
-### Example: run headless (no GUI)
+---
+
+## Configuration profiles
+
+Quickly switch between operating modes without editing YAML:
+
+| Profile | FPS | Thresholds | Lip-Sync | LLM | Diarization | Use case |
+|---|---|---|---|---|---|---|
+| **high-security** | 15 | 0.10 / 0.30 / 0.60 | ✅ | ✅ | ✅ | Critical meetings, board calls |
+| **balanced** | 5 | 0.20 / 0.45 / 0.75 | ✅ | ❌ | ❌ | Default — everyday use |
+| **low-resource** | 3 | 0.30 / 0.55 / 0.85 | ❌ | ❌ | ❌ | Laptop, limited CPU |
 
 ```bash
-meetguard --headless
+meetguard --profile high-security
 ```
 
-### Example: list audio devices
+---
+
+## Architecture
+
+```
+Every 200ms:  screen grab (5 FPS) + audio loopback (16kHz)
+                    │
+                    ▼  Every 3 seconds
+         ┌─────────────────────┐
+         │  Diarization (opt)  │── isolate speakers → per-speaker voice scoring
+         │                     │
+         │   5 Detectors       │
+         │  • Face (3DCNN)     │──→ deepfake score
+         │  • Voice (ECAPA)    │──→ mismatch score
+         │  • Lip (SyncNet)    │──→ drift score
+         │  • NLP (BERT)       │──→ suspicious score
+         │  • Urgency (RE)     │──→ pressure score
+         └────────┬────────────┘
+                  ▼
+         ┌─────────────────────┐
+         │   Fusion Engine     │──→ total_risk (weighted sum)
+         │   Classifier        │──→ SAFE / MONITOR / SUSPICIOUS / CRITICAL
+         └────────┬────────────┘
+                  ▼
+         ┌─────────────────────┐
+         │     Alerting        │
+         │  • Desktop popup    │
+         │  • Sound alert      │
+         │  • Save 30s clip    │
+         │  • Webhooks         │
+         │  • SQLite log       │
+         └─────────────────────┘
+```
+
+---
+
+## API
+
+When running, MeetGuard serves a REST API on port **8573**:
 
 ```bash
-meetguard --list-audio-devices
+curl http://127.0.0.1:8573/api/v1/status
+curl http://127.0.0.1:8573/api/v1/status/risk
+curl http://127.0.0.1:8573/api/v1/alerts?limit=10
+curl http://127.0.0.1:8573/api/v1/voiceprints
 ```
+
+WebSocket at `ws://127.0.0.1:8573/ws` streams real-time updates.
 
 ---
 
@@ -144,68 +215,18 @@ fusion:
     critical: 0.75    # ≥ 0.75 triggers desktop alert + clip + webhooks
 ```
 
-Webhook integration (Slack / Discord / Email):
+Webhook integration for real-time alerting:
 
 ```yaml
 alerting:
   webhooks:
-    slack_url: "https://hooks.slack.com/services/..."
-    discord_url: "https://discord.com/api/webhooks/..."
+    slack_url: "https://hooks.slack.com/services/T00/B00/xxx"
+    discord_url: "https://discord.com/api/webhooks/xxx"
     email:
       smtp_host: "smtp.gmail.com"
-      from_addr: "meetguard@example.com"
-      to_addrs: ["security@example.com"]
+      from_addr: "meetguard@yourcompany.com"
+      to_addrs: ["security@yourcompany.com"]
 ```
-
----
-
-## How it works
-
-```
-Every 200ms:  screen grab (5 FPS) + audio loopback (16kHz)
-                 │
-                 ▼  Every 3 seconds
-         ┌─────────────────┐
-         │   5 Detectors   │
-         │  • Face (3DCNN) │──→ deepfake score
-         │  • Voice (ECAPA)│──→ mismatch score
-         │  • Lip (SyncNet)│──→ drift score
-         │  • NLP (BERT)   │──→ suspicious score
-         │  • Urgency (RE) │──→ pressure score
-         └────────┬────────┘
-                  ▼
-         ┌─────────────────┐
-         │   Fusion Engine │──→ total_risk (weighted sum)
-         │   Classifier    │──→ SAFE / MONITOR / SUSPICIOUS / CRITICAL
-         └────────┬────────┘
-                  ▼
-         ┌─────────────────┐
-         │     Alerting    │
-         │  • Desktop popup│
-         │  • Sound alert  │
-         │  • Save 30s clip│
-         │  • Webhooks     │
-         │  • SQLite log   │
-         └─────────────────┘
-```
-
-See [ARCHITECTURE.md](ARCHITECTURE.md) for a detailed data flow diagram.
-
----
-
-## API
-
-When running, MeetGuard serves a REST API on port 8573:
-
-```bash
-curl http://127.0.0.1:8573/api/v1/status
-curl http://127.0.0.1:8573/api/v1/status/risk
-curl http://127.0.0.1:8573/api/v1/alerts?limit=10
-curl http://127.0.0.1:8573/api/v1/sessions
-curl http://127.0.0.1:8573/api/v1/voiceprints
-```
-
-WebSocket at `ws://127.0.0.1:8573/ws` streams real-time updates.
 
 ---
 
@@ -213,42 +234,31 @@ WebSocket at `ws://127.0.0.1:8573/ws` streams real-time updates.
 
 ```
 meetguard/
-├── capture/          # Screen + audio capture, ring buffers
-├── processing/       # Face extraction, voiceprint, transcription
-├── detectors/        # 5 detection modules + LLM fallback
-├── fusion/           # Risk aggregation, classification, alert rules
-├── alerting/         # Notifications, webhooks, recording, dashboard server
-├── api/              # REST API (FastAPI router)
-├── storage/          # SQLite voiceprints + session logs
-├── ui/               # Gradio dashboard
-├── utils/            # Data models, logging
-├── config.py         # YAML config loader + validator
-└── main.py           # Entry point, engine, CLI
+├── cli/               # CLI subcommands (status, alerts, report)
+├── capture/           # Screen + audio capture, ring buffers, audio wizard
+├── processing/        # Face extraction, voiceprint, transcription, diarization
+├── detectors/         # 5 detection modules + LLM fallback
+├── fusion/            # Risk aggregation, classification, alert rules
+├── alerting/          # Notifications, webhooks, recording, dashboard server
+├── api/               # REST API (FastAPI router)
+├── storage/           # SQLite voiceprints + session logs
+├── ui/                # Gradio dashboard (with performance metrics)
+├── utils/             # Data models, logging
+├── config.py          # YAML config loader + validator
+├── profiles.py        # Configuration profiles
+└── main.py            # Entry point, engine, CLI
 ```
 
 ---
 
-## Development
+## About the author
 
-```bash
-make dev          # Install dev dependencies
-make test         # Run all tests
-make test-cov     # With coverage report
-make lint         # ruff + black
-make format       # auto-format code
-make dry-run      # Validate config
-```
+Built by **Abhirup Guha** at **Info Security Solution**.
 
----
+Info Security Solution specializes in cybersecurity tools for detecting AI-powered threats, including deepfake impersonation, social engineering, and financial fraud in enterprise communication channels.
 
-## Roadmap
-
-- [ ] **Diarization integration** — isolate speakers before voice comparison
-- [ ] **Prosodic urgency detection** — detect stress from speech rate / pitch
-- [ ] **Performance dashboard** — FPS, buffer fill, inference times
-- [ ] **Configuration profiles** — high-security / balanced / low-resource presets
-- [ ] **Configuration UI** — in-dashboard settings editor
-- [ ] **Windows installer** — PyInstaller + NSIS
+- GitHub: [@fir3storm](https://github.com/fir3storm)
+- Project: [MeetGuard AI](https://github.com/fir3storm/MeetGuard-AI)
 
 ---
 
@@ -256,4 +266,4 @@ make dry-run      # Validate config
 
 MIT — see [LICENSE](LICENSE).
 
-Built by [Abhirup Guha](https://github.com/fir3storm).
+Copyright (c) 2026 Abhirup Guha — Info Security Solution

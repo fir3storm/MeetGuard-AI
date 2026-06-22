@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="shield" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f3460"/>
+      <stop offset="100%" style="stop-color:#1a1a5e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#e94560"/>
+      <stop offset="100%" style="stop-color:#ff6b6b"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e94560;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#e94560;stop-opacity:0"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="200" cy="200" r="195" fill="url(#bg)"/>
+  <circle cx="200" cy="200" r="185" fill="none" stroke="url(#ring)" stroke-width="2"/>
+
+  <!-- Outer ring -->
+  <circle cx="200" cy="200" r="140" fill="none" stroke="#e94560" stroke-width="2" stroke-dasharray="8,6" opacity="0.4"/>
+
+  <!-- Shield shape -->
+  <path d="M200 80 L280 110 L280 200 C280 260 240 300 200 320 C160 300 120 260 120 200 L120 110 Z"
+        fill="url(#shield)" stroke="#e94560" stroke-width="3" filter="url(#shadow)"/>
+
+  <!-- Shield inner highlight -->
+  <path d="M200 95 L265 120 L265 200 C265 252 232 288 200 305 C168 288 135 252 135 200 L135 120 Z"
+        fill="none" stroke="#e94560" stroke-width="1" opacity="0.3"/>
+
+  <!-- M letter -->
+  <text x="200" y="195" text-anchor="middle" font-family="Arial Black, sans-serif" font-weight="900"
+        font-size="72" fill="#ffffff" filter="url(#glow)">M</text>
+
+  <!-- G letter (slightly smaller, inset) -->
+  <text x="200" y="255" text-anchor="middle" font-family="Arial Black, sans-serif" font-weight="900"
+        font-size="48" fill="url(#accent)" filter="url(#glow)">G</text>
+
+  <!-- Eye / scan line across shield -->
+  <line x1="145" y1="218" x2="255" y2="218" stroke="#00d2ff" stroke-width="1.5" opacity="0.6"/>
+  <circle cx="200" cy="218" r="3" fill="#00d2ff" opacity="0.8"/>
+
+  <!-- Radar arcs (sweeping detection) -->
+  <path d="M200 200 L200 130 A70 70 0 0 1 270 200 Z"
+        fill="#e94560" opacity="0.08">
+    <animateTransform attributeName="transform" type="rotate" from="0 200 200" to="360 200 200"
+                      dur="4s" repeatCount="indefinite"/>
+  </path>
+
+  <!-- Small decorative dots -->
+  <circle cx="145" cy="145" r="2" fill="#e94560" opacity="0.6"/>
+  <circle cx="255" cy="145" r="2" fill="#e94560" opacity="0.6"/>
+  <circle cx="130" cy="200" r="1.5" fill="#00d2ff" opacity="0.4"/>
+  <circle cx="270" cy="200" r="1.5" fill="#00d2ff" opacity="0.4"/>
+
+  <!-- Bottom text -->
+  <text x="200" y="360" text-anchor="middle" font-family="Arial, sans-serif" font-weight="300"
+        font-size="18" fill="#888" letter-spacing="6">MEETGUARD AI</text>
+
+  <!-- Version indicator dots -->
+  <circle cx="185" cy="375" r="2" fill="#e94560" opacity="0.5"/>
+  <circle cx="192" cy="375" r="2" fill="#e94560" opacity="0.5"/>
+  <circle cx="199" cy="375" r="2" fill="#e94560" opacity="0.5"/>
+  <circle cx="206" cy="375" r="2" fill="#e94560" opacity="0.5"/>
+  <circle cx="213" cy="375" r="2" fill="#e94560" opacity="0.5"/>
+</svg>
