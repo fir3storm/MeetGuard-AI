@@ -87,7 +87,7 @@ class ScreenCapture:
                         self._on_frame(frame)
                     except Exception:
                         self._log.exception("frame callback error")
-                elapsed = time.perf_counter() - t0
+                elapsed = time.perf_counter() - now
                 sleep = max(0, interval - elapsed)
                 if sleep > 0:
                     time.sleep(sleep)
@@ -96,6 +96,11 @@ class ScreenCapture:
         """Synchronous grab — useful for testing."""
         if mss is None:
             return None
+        with mss.mss() as sct:
+            mon = sct.monitors[1]
+            raw = sct.grab(mon)
+            return np.array(raw)[:, :, :3]
+        return None
         with mss.mss() as sct:
             mon = sct.monitors[1]
             raw = sct.grab(mon)

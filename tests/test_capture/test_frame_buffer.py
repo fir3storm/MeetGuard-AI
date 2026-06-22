@@ -63,3 +63,15 @@ class TestWindowSelector:
         from meetguard.capture.window_selector import find_meeting_window
         result = find_meeting_window(["NoMatch*"])
         assert result is None
+
+
+class TestScreenCaptureFPS:
+    def test_measured_fps_returns_default_when_no_frames(self):
+        try:
+            import cv2
+        except ImportError:
+            import pytest
+            pytest.skip("opencv-python not installed")
+        from meetguard.capture.screen_capture import ScreenCapture, CaptureConfig
+        cap = ScreenCapture(CaptureConfig(fps=10))
+        assert cap.measured_fps == 10.0

@@ -47,6 +47,13 @@ detectors:
     threshold: 0.60                            # Score ≥ 0.60 → urgency flagged
     use_prosodic: false                        # Audio-based prosodic analysis (Phase 2)
 
+# ── Speaker Diarization ──────────────────────────────────────────────
+# Isolates individual speakers before voice comparison.
+# Requires pyannote-audio and a HuggingFace access token.
+diarization:
+  enabled: false
+  hf_token: ""
+
 # ── Fusion Engine ─────────────────────────────────────────────────────
 fusion:
   # Weight each detector's contribution to total_risk (must sum to ~1.0)

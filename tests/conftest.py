@@ -36,7 +36,8 @@ def sample_config() -> dict[str, Any]:
             "audio_sample_rate": 16000,
             "buffer_seconds": 10,
             "window_title_patterns": ["Zoom*"],
-        },
+            "diarization": {"enabled": False, "hf_token": ""},
+    },
         "detectors": {
             "deepfake_face": {"enabled": True, "model_path": "", "window_frames": 16,
                              "threshold_suspicious": 0.5, "threshold_critical": 0.75},
@@ -49,6 +50,7 @@ def sample_config() -> dict[str, Any]:
                                       "api_url": "http://localhost:11434"}},
             "urgency_language": {"enabled": True, "threshold": 0.6, "use_prosodic": False},
         },
+        "diarization": {"enabled": False, "hf_token": ""},
         "fusion": {
             "weights": {"face": 0.30, "voice": 0.25, "lip": 0.15, "nlp": 0.20, "urgency": 0.10},
             "thresholds": {"monitor": 0.20, "suspicious": 0.45, "critical": 0.75},
